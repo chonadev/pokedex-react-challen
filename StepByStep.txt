@@ -1,0 +1,6 @@
+- Se crea el proyecto .. npx create-react-app my-app --template redux-typescript
+- Se prueba la app, npm start, se ve que la ide no detecta bien lso archivos tsx, se reinicia EsLint
+- Se agrega DockerFile y docker-compose
+- Se levanta el contenedor / docker compose build / docker compose up
+
+

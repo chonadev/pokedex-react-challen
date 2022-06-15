@@ -1,19 +1,21 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { Provider } from 'react-redux';
-import { store } from './app/store';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
-import './index.css';
+import { createRoot } from 'react-dom/client';
+import { ChakraProvider} from '@chakra-ui/react'
+import { BrowserRouter } from 'react-router-dom';
+import theme from './theme';
+import { AppRouter } from './router/AppRouter';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
 
 root.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <App />
-    </Provider>
+    <BrowserRouter>
+      <ChakraProvider theme={theme}>
+        <AppRouter />
+      </ChakraProvider>
+    </BrowserRouter>
   </React.StrictMode>
 );
 
