@@ -1,13 +1,13 @@
-import { URL } from "url";
-
-export interface PokemonPaginated {
-  count?:    number;
-  next?:     string;
-  previous?: null;
-  results?:  PokemonBasic[];
-}
+import { URL } from 'url';
 
 export interface PokemonBasic {
-  name?: string;
-  url?:  URL;
+	name?: string;
+	url?: URL;
+}
+
+export interface PokemonPaginated {
+	count?: number;
+	next?: string;
+	previous?: null;
+	results?: PokemonBasic[];
 }
