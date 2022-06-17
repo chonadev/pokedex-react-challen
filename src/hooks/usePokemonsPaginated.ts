@@ -23,8 +23,8 @@ export function usePokemonPaginated() {
       .then((resp:PokemonPaginated) => {
       setNextUrl(resp.next);
       getPokemonData(resp.results);
+      
     });
-    
   }, [actualUrl])
   
   const loadMore = () => {

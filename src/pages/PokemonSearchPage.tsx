@@ -11,7 +11,6 @@ import Loading from "../components/Loading"
 
 export const PokemonSearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filter, setFilter] = useState();
   const [pokemon, setPokemon] = useState<Pokemon | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -26,6 +25,14 @@ export const PokemonSearchPage = () => {
     setSearchTerm("");
   }
 
+  const showError = () => toast({
+      title: 'Not found',
+      description: "No se encontro pokemon.",
+      status: 'warning',
+      duration: 5000,
+      isClosable: true,
+  });
+
   useEffect(() => {
     if (debouncedSearchTerm) {
       setIsLoading(true);
@@ -35,13 +42,7 @@ export const PokemonSearchPage = () => {
         
       }).catch(() => {
         setIsLoading(false);
-        toast({
-          title: 'Not found',
-          description: "No se encontro pokemon.",
-          status: 'warning',
-          duration: 5000,
-          isClosable: true,
-        })
+        showError();
       });
     } else {
       setPokemon(undefined);
@@ -75,7 +76,7 @@ export const PokemonSearchPage = () => {
           handleClickAFilterBtn={handleClickAFilterBtn} />
 
         { pokemon ? 
-          (pokemon && <CardPokemon pokemon={pokemon} />)
+          (pokemon && <Container maxW="md" pt={6} ><CardPokemon pokemon={pokemon} /></Container>)
           :
           (<GridPokemons/>)
         }
