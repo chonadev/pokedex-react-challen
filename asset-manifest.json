@@ -1,0 +1,12 @@
+{
+  "files": {
+    "main.js": "/pokedex-react-challen/static/js/main.0f1a5ff3.js",
+    "static/js/787.a3e8e70d.chunk.js": "/pokedex-react-challen/static/js/787.a3e8e70d.chunk.js",
+    "index.html": "/pokedex-react-challen/index.html",
+    "main.0f1a5ff3.js.map": "/pokedex-react-challen/static/js/main.0f1a5ff3.js.map",
+    "787.a3e8e70d.chunk.js.map": "/pokedex-react-challen/static/js/787.a3e8e70d.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.0f1a5ff3.js"
+  ]
+}
