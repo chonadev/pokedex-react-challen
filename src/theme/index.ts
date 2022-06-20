@@ -1,9 +1,13 @@
-import { extendTheme, theme } from '@chakra-ui/react';
+import { extendTheme } from '@chakra-ui/react';
 
 export default extendTheme({
 	initialColorMode: 'light',
 	useSystemColorMode: false,
 	colors: {
-		primary: theme.colors.twitter,
+		brand: {
+			100: '#f7fafc',
+			// ...
+			900: '#1a202c',
+		},
 	},
 });

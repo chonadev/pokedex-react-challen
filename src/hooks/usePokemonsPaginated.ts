@@ -1,12 +1,13 @@
+import { API_URL_POKEMON } from './../utils/httpClient';
 import { useEffect, useState } from 'react';
 import { Pokemon } from '../types/Pokemon.interface';
 import { PokemonPaginated } from '../types/PokemonPaginated.interface';
 
 export function usePokemonPaginated() {
 	const [pokemons, setPokemons] = useState<Pokemon[]>([]);
-	const [actualUrl, setActualUrl] = useState<string>('https://pokeapi.co/api/v2/pokemon');
-	const [nextUrl, setNextUrl] = useState<any>();
-	const [isLoading, setIsLoading] = useState(true);
+	const [actualUrl, setActualUrl] = useState<string>(API_URL_POKEMON);
+	const [nextUrl, setNextUrl] = useState<string>('');
+	const [previousUrl, setPreviousUrl] = useState<string>('');
 
 	const getPokemonData = async (res: any) => {
 		res.map(async (item: any) => {
@@ -17,22 +18,28 @@ export function usePokemonPaginated() {
 	};
 
 	useEffect(() => {
-		setIsLoading(true);
-		const getPokemon = () =>
-			fetch(actualUrl)
-				.then(resp => resp.json())
-				.then((resp: PokemonPaginated) => {
-					setNextUrl(resp.next);
-					getPokemonData(resp.results);
-					setIsLoading(false);
-				});
-		getPokemon();
+		const fetchData = async () => {
+			setPokemons([]);
+			const json: PokemonPaginated = await fetch(actualUrl).then(res => res.json());
+			getPokemonData(json.results);
+			if (json.next) {
+				setNextUrl(json.next);
+			}
+			if (json.previous) {
+				setPreviousUrl(json.previous);
+			}
+		};
+
+		fetchData();
 	}, [actualUrl]);
 
-	const loadMore = () => {
-		setIsLoading(true);
+	const loadNext = () => {
 		setActualUrl(nextUrl);
 	};
 
-	return { pokemons, loadMore, isLoading, setPokemons };
+	const loadPrev = () => {
+		setActualUrl(previousUrl);
+	};
+
+	return { pokemons, loadPrev, loadNext };
 }

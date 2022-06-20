@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Button, Center, Select, SimpleGrid } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { Button, Select, SimpleGrid, HStack, Container } from '@chakra-ui/react';
 import { usePokemonPaginated } from '../hooks/usePokemonsPaginated';
-import CardPokemon from './CardPokemon';
-import Loading from './Loading';
 import { Pokemon } from '../types/Pokemon.interface';
+import PokemonCard from './PokemonCard';
 
 const GridPokemons = () => {
-	const { pokemons, isLoading, loadMore, setPokemons } = usePokemonPaginated();
+	const { pokemons, loadPrev, loadNext } = usePokemonPaginated();
 	const [filterSelected, setFilterSelected] = useState<string>('lowest');
 
 	const handleChangeFilter = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -17,10 +16,10 @@ const GridPokemons = () => {
 
 	const orderPokemons = (option: string) => {
 		if (option.match('lowest')) {
-			setPokemons(pokemons.sort((a: Pokemon, b: Pokemon) => a.id - b.id));
+			pokemons.sort((a: Pokemon, b: Pokemon) => a.id - b.id);
 		}
 		if (option.match('highest')) {
-			setPokemons(pokemons.sort((a: Pokemon, b: Pokemon) => b.id - a.id));
+			pokemons.sort((a: Pokemon, b: Pokemon) => b.id - a.id);
 		}
 		if (option.match('order_A_Z')) {
 			pokemons.sort((a: Pokemon, b: Pokemon) => (a.name > b.name ? 1 : -1));
@@ -30,36 +29,25 @@ const GridPokemons = () => {
 		}
 	};
 
-	useEffect(() => {
-		if (!isLoading && pokemons.length > 1) {
-			// setFilterSelected('lowest');
-		}
-	}, [pokemons, isLoading]);
-
-	if (isLoading) {
-		return <Loading />;
-	}
-
 	return (
 		<>
-			<Box>
+			<Container>
 				<Select variant='filled' defaultValue={filterSelected} onChange={handleChangeFilter}>
 					<option value='lowest'> order Lowest</option>
 					<option value='highest'> order Highest</option>
 					<option value='order_A_Z'> order A-Z</option>
 					<option value='order_Z_A'> order Z-A</option>
 				</Select>
-			</Box>
+			</Container>
+
+			<HStack py={3} columnGap='3'>
+				<Button onClick={loadPrev}> previus </Button>
+				<Button onClick={loadNext}> next </Button>
+			</HStack>
 
 			<SimpleGrid columns={[2, null, 4]} spacing='2' py={6}>
-				{!isLoading &&
-					pokemons &&
-					pokemons.map((poke: Pokemon) => <CardPokemon key={poke.id} pokemon={poke} />)}
+				{pokemons && pokemons.map((poke: Pokemon) => <PokemonCard key={poke.id} pokemon={poke} />)}
 			</SimpleGrid>
-
-			<Center py={3} onClick={loadMore}>
-				<Button> Load more </Button>
-			</Center>
 		</>
 	);
 };

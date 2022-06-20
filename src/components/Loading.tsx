@@ -3,7 +3,7 @@ import React from 'react';
 
 const Loading = () => {
 	return (
-		<Center h='100'>
+		<Center h='auto'>
 			<Spinner />
 		</Center>
 	);

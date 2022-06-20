@@ -2,14 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
 	Badge,
-	Box,
 	Button,
 	Center,
 	Container,
 	Divider,
 	Heading,
 	Image,
-	Progress,
 	Stack,
 	Tab,
 	TabList,
@@ -18,12 +16,16 @@ import {
 	Tabs,
 	Text,
 	useToast,
+	VStack,
 } from '@chakra-ui/react';
 import { Pokemon } from '../types/Pokemon.interface';
-import { get } from '../utils/httpClient';
 import { motion } from 'framer-motion';
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import Loading from '../components/Loading';
+import { apiGetPokemonByIdOrName } from '../utils/httpClient';
+import StatPokemon from '../components/StatPokemon';
+import AbilitiePokemon from '../components/AbilitiePokemon';
+import NotFoundPokemon from '../components/NotFoundPokemon';
 
 export const PokemonDetailPage = () => {
 	const { id } = useParams();
@@ -43,27 +45,30 @@ export const PokemonDetailPage = () => {
 		navigate(-1);
 	};
 
+	function showToast() {
+		toast({
+			title: '404',
+			description: 'Not Found Pokemon.',
+			status: 'warning',
+			duration: 4000,
+			isClosable: true,
+		});
+	}
+
 	useEffect(() => {
 		setIsLoading(true);
-
-		function showToast() {
-			toast({
-				title: 'Not found',
-				description: 'No se encontro pokemon.',
-				status: 'warning',
-				duration: 5000,
-				isClosable: true,
-			});
-		}
-
-		get(`/pokemon/${id}`)
-			.then((data: Pokemon) => {
+		if (id) {
+			const fetchData = async () => {
+				const data = await apiGetPokemonByIdOrName(id).catch(() => {
+					setIsLoading(false);
+					showToast();
+				});
 				setPokeDetail(data);
 				setIsLoading(false);
-			})
-			.catch(() => {
-				showToast();
-			});
+			};
+
+			fetchData();
+		}
 	}, [id]);
 
 	if (isLoading) {
@@ -71,16 +76,14 @@ export const PokemonDetailPage = () => {
 	}
 
 	return (
-		<>
+		<VStack>
 			<Container py={3}>
 				<Button leftIcon={<ArrowBackIcon />} size='lg' variant='ghost' onClick={handleClickBack} />
 				<Heading as='h2' textAlign='center' py={3} textTransform='capitalize'>
-					{' '}
-					{pokeDetail?.name}{' '}
+					{pokeDetail?.name}
 				</Heading>
 				<Text fontSize='medium' textAlign='center'>
-					{' '}
-					{`${pokeDetail?.id}`.padStart(3, '0')}{' '}
+					{`${pokeDetail?.id}`.padStart(3, '0')}
 				</Text>
 
 				<motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
@@ -89,7 +92,7 @@ export const PokemonDetailPage = () => {
 							sx={basicBoxStyles}
 							boxSize={[300, null, 400]}
 							src={pokeDetail?.sprites.front_default}
-							fallback={<Loading />}
+							fallback={<NotFoundPokemon />}
 						/>
 					</Center>
 				</motion.div>
@@ -103,36 +106,27 @@ export const PokemonDetailPage = () => {
 				</Stack>
 			</Container>
 			<Divider />
-			<Container py={3}>
+			<Container>
 				<Center>
 					<Tabs colorScheme='gray' variant='solid-rounded' isLazy>
 						<TabList>
 							<Tab> Stats </Tab>
 							<Tab> Abilities </Tab>
-							<Tab> Evolutions </Tab>
 						</TabList>
 						<TabPanels>
 							<TabPanel>
 								{pokeDetail?.stats &&
-									pokeDetail.stats.map((stat, index) => (
-										<Box key={index} py={1}>
-											{stat.stat?.name}{' '}
-											<Progress value={stat.base_stat && stat.base_stat / 2} size='xs' />
-										</Box>
-									))}
+									pokeDetail.stats.map(item => <StatPokemon key={item.stat?.name} stat={item} />)}
 							</TabPanel>
 							<TabPanel>
 								{pokeDetail?.abilities?.map(item => (
-									<Text key={item.ability?.name} py={1}>
-										{item.ability?.name}
-									</Text>
+									<AbilitiePokemon key={item.ability?.name} abilitie={item} />
 								))}
 							</TabPanel>
-							<TabPanel></TabPanel>
 						</TabPanels>
 					</Tabs>
 				</Center>
 			</Container>
-		</>
+		</VStack>
 	);
 };

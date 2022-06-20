@@ -9,7 +9,7 @@ interface PokemonProps {
 	pokemon: Pokemon;
 }
 
-const CardPokemon = ({ pokemon }: PokemonProps) => {
+const PokemonCard = ({ pokemon }: PokemonProps) => {
 	const navigate = useNavigate();
 
 	if (!pokemon.id) {
@@ -22,7 +22,7 @@ const CardPokemon = ({ pokemon }: PokemonProps) => {
 
 	return (
 		<motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-			<Box shadow='md' borderWidth='1px' borderRadius='sm' onClick={handleClickCard}>
+			<Box shadow='md' borderWidth='1px' borderRadius='md' onClick={handleClickCard}>
 				<Image width='100%' src={pokemon.sprites.front_default} fallback={<Loading />} />
 				<Text textAlign='center' fontSize='md'>
 					{`${pokemon.id}`.padStart(4, '0')}
@@ -35,4 +35,4 @@ const CardPokemon = ({ pokemon }: PokemonProps) => {
 	);
 };
 
-export default CardPokemon;
+export default PokemonCard;

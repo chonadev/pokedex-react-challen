@@ -1,18 +1,19 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
-import { Container, Heading, HStack, Text, useToast, VStack } from '@chakra-ui/react';
-import { get } from '../utils/httpClient';
+import { Container, HStack, Text, useToast, VStack } from '@chakra-ui/react';
 import { useDebounce } from '../hooks/useDebounce';
 import { ColorModeSwitch } from '../components/ColorModeSwich';
 import { Pokemon } from '../types/Pokemon.interface';
-import CardPokemon from '../components/CardPokemon';
 import { SearchPokemon } from '../components/SearchPokemon';
 import GridPokemons from '../components/GridPokemons';
+import PokemonCard from '../components/PokemonCard';
+import { apiGetPokemonByIdOrName } from '../utils/httpClient';
+import { HeaderColored } from '../components/HeaderColored';
 import Loading from '../components/Loading';
 
 export const PokemonSearchPage = () => {
 	const [searchTerm, setSearchTerm] = useState('');
-	const [pokemon, setPokemon] = useState<Pokemon | undefined>(undefined);
-	const [isLoading, setIsLoading] = useState(false);
+	const [isSearchLoading, setIsSearchLoading] = useState(false);
+	const [pokemonFound, setPokemonFound] = useState<Pokemon>();
 	const debouncedSearchTerm = useDebounce(searchTerm, 500);
 	const toast = useToast();
 
@@ -25,71 +26,59 @@ export const PokemonSearchPage = () => {
 		setSearchTerm('');
 	};
 
-	useEffect(() => {
-		function showToast() {
-			toast({
-				title: 'Not found',
-				description: 'No se encontro pokemon.',
-				status: 'warning',
-				duration: 5000,
-				isClosable: true,
-			});
-		}
+	function showToast() {
+		toast({
+			title: 'Not found',
+			description: 'Not Found Pokemon.',
+			status: 'warning',
+			duration: 4000,
+			isClosable: true,
+		});
+	}
 
+	useEffect(() => {
 		if (debouncedSearchTerm) {
-			setIsLoading(true);
-			get(`/pokemon/${searchTerm}`)
-				.then((data: Pokemon) => {
-					setIsLoading(false);
-					setPokemon(data);
-				})
-				.catch(() => {
-					setIsLoading(false);
-					showToast();
-				});
-		} else {
-			setPokemon(undefined);
-			setIsLoading(false);
+			setIsSearchLoading(true);
+			const fetchData = async () => {
+				const data = await apiGetPokemonByIdOrName(searchTerm)
+					.catch(() => {
+						showToast();
+					})
+					.finally(() => setIsSearchLoading(false));
+
+				setPokemonFound(data);
+			};
+
+			fetchData();
 		}
 	}, [debouncedSearchTerm]);
 
-	if (isLoading) {
-		return <Loading />;
-	}
-
 	return (
 		<VStack>
-			<Container maxW='container.sm' centerContent>
-				<HStack direction='row' w='container'>
-					<Heading
-						color='gray.500'
-						py={6}
-						bgGradient='linear(to-l, #7928CA, #FF0080)'
-						bgClip='text'
-						fontSize='6xl'
-						fontWeight='extrabold'
-					>
-						Pokedex
-					</Heading>
+			<Container maxW='container' centerContent>
+				<HStack pt={3}>
 					<ColorModeSwitch />
 				</HStack>
 
-				<Text color='gray.500' pb={6}>
-					Search for a pokemon by name.
+				<HeaderColored>Pokedex</HeaderColored>
+
+				<Text color='gray.500' pb={3}>
+					Search your pokemon.
 				</Text>
 
-				<SearchPokemon
-					searchTerm={searchTerm}
-					handleInputChange={handleInputChange}
-					handleClickClearSearch={handleClickClearSearch}
-				/>
+				<HStack>
+					<SearchPokemon
+						searchTerm={searchTerm}
+						handleInputChange={handleInputChange}
+						handleClickClearSearch={handleClickClearSearch}
+					/>
+					{isSearchLoading && <Loading />}
+				</HStack>
 
-				{pokemon ? (
-					pokemon && (
-						<Container maxW='md' pt={6}>
-							<CardPokemon pokemon={pokemon} />
-						</Container>
-					)
+				{pokemonFound && pokemonFound?.name ? (
+					<Container maxW='md' pt={6}>
+						<PokemonCard pokemon={pokemonFound} />
+					</Container>
 				) : (
 					<GridPokemons />
 				)}
